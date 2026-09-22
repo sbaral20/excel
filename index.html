@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Java in .NET: 3 Ways to Expose Java Functions</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --panel-alt: #eef4ff;
+      --text: #1f2937;
+      --muted: #586575;
+      --primary: #1243b5;
+      --primary-2: #3b82f6;
+      --green: #1f9d6f;
+      --amber: #d97706;
+      --red: #b91c1c;
+      --shadow: 0 18px 40px rgba(17, 24, 39, 0.12);
+      --border: rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 20px 64px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #122d6d 0%, #1f4fd8 52%, #0ea5e9 100%);
+      color: white;
+      border-radius: 20px;
+      padding: 42px 36px;
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 12px;
+      opacity: 0.8;
+      font-weight: 700;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4vw, 3.3rem);
+      margin: 14px 0 12px;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      font-size: 1.08rem;
+      max-width: 760px;
+      opacity: 0.95;
+      margin: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+      margin-top: 28px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 22px 20px;
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 1.4rem;
+    }
+
+    .pill {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 7px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .pill.jni { background: rgba(17, 24, 39, 0.06); color: #111827; }
+    .pill.ikvm { background: rgba(59, 130, 246, 0.12); color: var(--primary); }
+    .pill.grpc { background: rgba(31, 157, 111, 0.12); color: var(--green); }
+
+    .section {
+      margin-top: 38px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 26px 24px;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: clamp(1.6rem, 2vw, 2.1rem);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--panel-alt);
+    }
+
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: #dfeaff;
+      color: #102a6e;
+      font-size: 0.95rem;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .good { color: var(--green); font-weight: 700; }
+    .warn { color: var(--amber); font-weight: 700; }
+    .bad { color: var(--red); font-weight: 700; }
+
+    .module-list {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .module-item {
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--primary-2);
+      background: #fafcff;
+      padding: 18px 18px 16px;
+      border-radius: 12px;
+    }
+
+    .module-item h4 {
+      margin: 0 0 8px;
+      font-size: 1.15rem;
+    }
+
+    .code {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-top: 18px;
+      overflow-x: auto;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.95rem;
+    }
+
+    ul { padding-left: 20px; }
+
+    .note {
+      margin-top: 18px;
+      background: #f8fafc;
+      border-left: 4px solid #60a5fa;
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 640px) {
+      .hero { padding: 30px 22px; }
+      .section { padding: 20px 16px; }
+      th, td { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="hero">
+      <div class="eyebrow">Java + .NET Integration</div>
+      <h1>3 Ways Java Functions Can Be Used in .NET</h1>
+      <p class="subtitle">
+        This demo shows three practical patterns for making Java logic available to a .NET app:
+        JNI, IKVM, and gRPC. Each option has a different tradeoff in speed, compatibility, and ease of integration.
+      </p>
+    </header>
+
+    <section class="grid">
+      <article class="card">
+        <span class="pill jni">JNI</span>
+        <h3>Java Native Interface</h3>
+        <p>
+          .NET directly loads the Java VM and calls Java classes from native code. This is the closest to direct runtime interop.
+        </p>
+      </article>
+
+      <article class="card">
+        <span class="pill ikvm">IKVM</span>
+        <h3>Java Interop via IKVM</h3>
+        <p>
+          A Java jar is converted into .NET-friendly assemblies, letting .NET call Java classes as if they were native .NET classes.
+        </p>
+      </article>
+
+      <article class="card">
+        <span class="pill grpc">gRPC</span>
+        <h3>Remote Service Call</h3>
+        <p>
+          Java exposes a service over HTTP/2, and the .NET application sends a request and gets a result back over the network.
+        </p>
+      </article>
+    </section>
+
+    <section class="section">
+      <h2>Comparison Table</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Approach</th>
+            <th>Advantages</th>
+            <th>Disadvantages</th>
+            <th>Performance</th>
+            <th>Ease of Doing</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>JNI</strong></td>
+            <td>Very low latency, direct access to Java runtime, good for performance-sensitive local integration.</td>
+            <td>Harder to maintain, requires native setup, JVM lifecycle management, and careful memory handling.</td>
+            <td><span class="good">Very high</span> for in-process calls</td>
+            <td><span class="bad">Hard</span> — more native code and platform complexity</td>
+          </tr>
+          <tr>
+            <td><strong>IKVM</strong></td>
+            <td>Nice .NET developer experience, easier invocation from managed code, good for bridging existing Java libraries.</td>
+            <td>Requires Java jars and compatible runtime dependencies, can have compatibility issues with some Java APIs.</td>
+            <td><span class="good">High</span>, usually near native managed call speed</td>
+            <td><span class="warn">Medium</span> — easier than JNI but still needs setup</td>
+          </tr>
+          <tr>
+            <td><strong>gRPC</strong></td>
+            <td>Strong separation of concerns, cross-language and cross-platform, easy to scale and deploy independently.</td>
+            <td>Network overhead, service ownership, and extra operational complexity for deployment and diagnostics.</td>
+            <td><span class="warn">Medium</span> — best for remote services rather than tight local calls</td>
+            <td><span class="good">Easy</span> to model and consume in modern .NET apps</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>Example Modules in This Workspace</h2>
+      <div class="module-list">
+        <div class="module-item">
+          <h4>javaAPIs</h4>
+          <p>
+            This is the shared Java library that contains the Java implementation being accessed from .NET. The key logic is a method named
+            <strong>customAdd(int a, int b)</strong>, which simply adds two numbers and returns the result.
+          </p>
+        </div>
+
+        <div class="module-item">
+          <h4>dotNetJavaWithJNI</h4>
+          <p>
+            This module loads the JVM using JNI and invokes the Java class directly from .NET. It demonstrates the lowest-level way of
+            calling Java functions by creating a JVM instance and then calling a Java method from managed code.
+          </p>
+        </div>
+
+        <div class="module-item">
+          <h4>dotNetJavaWithkvm</h4>
+          <p>
+            This module shows the IKVM approach. It uses the Java API as a .NET-compatible library so the code can call Java classes like
+            normal .NET objects instead of manually managing JNI function pointers and native VM setup.
+          </p>
+        </div>
+
+        <div class="module-item">
+          <h4>javaAPIService</h4>
+          <p>
+            This is the Java service project. It exposes a gRPC endpoint that adds two integer values and returns the result. It is the remote
+            service used by the .NET client to demonstrate inter-process interoperability.
+          </p>
+        </div>
+
+        <div class="module-item">
+          <h4>dotnetJavaWithgRPC</h4>
+          <p>
+            This is the .NET client that calls the Java gRPC service at localhost on port 50051. It creates a client channel and sends an AddRequest,
+            receiving an AddResponse with the computed sum.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Which One to Choose?</h2>
+      <ul>
+        <li><strong>Choose JNI</strong> when you need the fastest direct in-process integration and you are comfortable with native runtime setup.</li>
+        <li><strong>Choose IKVM</strong> when you want a more managed and .NET-friendly Java bridge without writing low-level native code.</li>
+        <li><strong>Choose gRPC</strong> when you want a stable, scalable, language-neutral service boundary that is easier to deploy and maintain.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Run It Using the Script</h2>
+      <p>
+        If the entire <strong>excel</strong> folder has been downloaded locally, open PowerShell in that folder and run the script below:
+      </p>
+
+      <div class="code">cd &lt;Your project folder&gt;\excel
+.\runAll.ps1</div>
+
+      <p>
+        The script will do the following in order:
+      </p>
+      <ul>
+        <li>Build the shared Java API</li>
+        <li>Run the JNI validation test</li>
+        <li>Run the IKVM validation test</li>
+        <li>Start the Java gRPC service</li>
+        <li>Run the .NET gRPC client against it</li>
+        <li>Stop the Java service and confirm it is no longer running</li>
+      </ul>
+
+      <div class="note">
+        <strong>Note:</strong> Make sure Java is installed and <strong>JAVA_HOME</strong> is set correctly before running the JNI-based example.
+      </div>
+    </section>
+  </div>
+</body>
+</html>

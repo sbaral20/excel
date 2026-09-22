@@ -1,0 +1,65 @@
+# Build outputs
+bin/
+obj/
+out/
+dist/
+build/
+target/
+
+# User-specific and local environment files
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.pid
+*.swp
+*.swo
+
+# NuGet / package manager caches
+packages/
+.nuget/
+node_modules/
+
+# Java / Maven / Gradle
+.gradle/
+.mvn/
+!**/.mvn/wrapper/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# .NET generated artifacts
+*.dbmdl
+*.pdb
+*.cache
+*.nupkg
+*.snupkg
+*.dll
+*.exe
+
+# Test and coverage outputs
+coverage/
+TestResults/
+*.trx
+
+# Local env/config
+.env
+.env.*
+local.settings.json
+appsettings.Development.json
+
+# Misc
+*.orig
+*.rej

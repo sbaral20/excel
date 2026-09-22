@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.example.grpc";
+option java_outer_classname = "CalculatorProto";
+option csharp_namespace = "GrpcCalculator";
+
+service CalculatorService {
+  rpc Add (AddRequest) returns (AddResponse);
+}
+
+message AddRequest {
+  int32 a = 1;
+  int32 b = 2;
+}
+
+message AddResponse {
+  int32 result = 1;
+}
